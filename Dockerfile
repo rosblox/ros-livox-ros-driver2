@@ -12,14 +12,14 @@ RUN apt update && apt install -y --no-install-recommends \
 COPY ros_entrypoint.sh .
 
 COPY Livox-SDK2 Livox-SDK2
-
-RUN cd ./Livox-SDK2 && mkdir build && cd build && cmake .. && make -j4 && make install
-
+RUN cd Livox-SDK2 && mkdir -p build && cd build && cmake .. && make -j4 && make install
 
 WORKDIR /colcon_ws
 COPY livox_ros_driver2 src/livox_ros_driver2 
 
-RUN . /opt/ros/${ROS_DISTRO}/setup.sh && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release --event-handlers console_direct+
+RUN cp src/livox_ros_driver2/package_ROS2.xml src/livox_ros_driver2/package.xml && \
+    . /opt/ros/${ROS_DISTRO}/setup.sh && \
+    colcon build --symlink-install --cmake-args -DROS_EDITION=${ROS_DISTRO} -DHUMBLE_ROS=${ROS_DISTRO} -DCMAKE_BUILD_TYPE=Release --event-handlers console_direct+
 
 ENV LAUNCH_COMMAND='ros2 launch livox_ros_driver2 msg_MID360_launch.py'
 
