@@ -1,0 +1,15 @@
+services:
+  ros-livox-ros-driver2:
+    image: ghcr.io/rosblox/ros-livox-ros-driver2:humble
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    network_mode: "host"
+    privileged: true
+    ipc: host
+    pid: host
+    environment:
+      - UID=${HOST_UID}
+      - ROS_DOMAIN_ID
+    command: su - ros --whitelist-environment=ROS_DOMAIN_ID /run.sh

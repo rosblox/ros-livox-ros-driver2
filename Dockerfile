@@ -17,13 +17,12 @@ RUN cd Livox-SDK2 && mkdir -p build && cd build && cmake .. && make -j4 && make 
 WORKDIR /colcon_ws
 COPY livox_ros_driver2 src/livox_ros_driver2 
 
-RUN cp src/livox_ros_driver2/package_ROS2.xml src/livox_ros_driver2/package.xml && \
-    . /opt/ros/${ROS_DISTRO}/setup.sh && \
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
     colcon build --symlink-install --cmake-args -DROS_EDITION=${ROS_DISTRO} -DHUMBLE_ROS=${ROS_DISTRO} -DCMAKE_BUILD_TYPE=Release --event-handlers console_direct+
 
 ENV LAUNCH_COMMAND='ros2 launch livox_ros_driver2 msg_MID360_launch.py'
 
 # Create build and run aliases
-RUN echo 'alias build="colcon build --symlink-install  --event-handlers console_direct+"' >> /etc/bash.bashrc && \
-    echo 'alias run="su - ros /run.sh"' >> /etc/bash.bashrc && \
-    echo "source /colcon_ws/install/setup.bash; $LAUNCH_COMMAND" >> /run.sh && chmod +x /run.sh
+RUN echo 'alias build="colcon build --symlink-install  --cmake-args -DROS_EDITION=${ROS_DISTRO} -DHUMBLE_ROS=${ROS_DISTRO} -DCMAKE_BUILD_TYPE=Release --event-handlers console_direct+ "' >> /etc/bash.bashrc && \
+    echo 'alias run="su - ros --whitelist-environment=\"ROS_DOMAIN_ID\" /run.sh"' >> /etc/bash.bashrc && \
+    echo "source /colcon_ws/install/setup.bash; echo UID: $UID; echo ROS_DOMAIN_ID: $ROS_DOMAIN_ID; $LAUNCH_COMMAND" >> /run.sh && chmod +x /run.sh
